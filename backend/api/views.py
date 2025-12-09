@@ -1,0 +1,116 @@
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.shortcuts import get_object_or_404
+from .models import ContactForm, Review, Program, Housing, SiteSettings
+from .serializers import (
+    ContactFormSerializer, ReviewSerializer, PublicReviewSerializer,
+    ProgramSerializer, HousingSerializer, SiteSettingsSerializer
+)
+
+
+class ContactFormViewSet(viewsets.ModelViewSet):
+    queryset = ContactForm.objects.all()
+    serializer_class = ContactFormSerializer
+    
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def submit(self, request):
+        """Public endpoint for submitting contact forms"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    
+    def get_permissions(self):
+        if self.action == 'list' and 'public' in self.request.query_params:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    def get_serializer_class(self):
+        if self.action == 'list' and 'public' in self.request.query_params:
+            return PublicReviewSerializer
+        return ReviewSerializer
+    
+    def get_queryset(self):
+        queryset = Review.objects.all()
+        if 'public' in self.request.query_params:
+            queryset = queryset.filter(is_approved=True)
+        if 'featured' in self.request.query_params:
+            queryset = queryset.filter(is_featured=True, is_approved=True)
+        return queryset
+    
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def public(self, request):
+        """Public endpoint for viewing approved reviews"""
+        reviews = self.get_queryset()
+        serializer = PublicReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def featured(self, request):
+        """Public endpoint for featured reviews (homepage)"""
+        reviews = Review.objects.filter(is_featured=True, is_approved=True)
+        serializer = PublicReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+
+class ProgramViewSet(viewsets.ModelViewSet):
+    queryset = Program.objects.filter(is_active=True)
+    serializer_class = ProgramSerializer
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return Program.objects.all()
+        return Program.objects.filter(is_active=True)
+
+
+class HousingViewSet(viewsets.ModelViewSet):
+    queryset = Housing.objects.filter(is_available=True)
+    serializer_class = HousingSerializer
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return Housing.objects.all()
+        return Housing.objects.filter(is_available=True)
+
+
+class SiteSettingsViewSet(viewsets.ModelViewSet):
+    queryset = SiteSettings.objects.all()
+    serializer_class = SiteSettingsSerializer
+    
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    def get_object(self):
+        obj, created = SiteSettings.objects.get_or_create(pk=1)
+        return obj
+    
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def public(self, request):
+        """Public endpoint for site settings"""
+        settings_obj, created = SiteSettings.objects.get_or_create(pk=1)
+        serializer = self.get_serializer(settings_obj)
+        return Response(serializer.data)
