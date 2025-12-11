@@ -6,6 +6,12 @@ from pathlib import Path
 import os
 from decouple import config
 
+# Try to import dj_database_url (for production), fallback to None if not available
+try:
+    import dj_database_url  # type: ignore
+except ImportError:
+    dj_database_url = None
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -13,9 +19,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# Allow Railway domain and custom domain
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.railway.app']
+if config('RAILWAY_PUBLIC_DOMAIN', default=None):
+    ALLOWED_HOSTS.append(config('RAILWAY_PUBLIC_DOMAIN'))
+if config('CUSTOM_DOMAIN', default=None):
+    ALLOWED_HOSTS.append(config('CUSTOM_DOMAIN'))
 
 # Application definition
 INSTALLED_APPS = [
@@ -27,11 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'whitenoise.runserver_nostatic',  # Use whitenoise for static files
     'api',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add whitenoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -60,12 +73,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'recovery_center.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Use PostgreSQL on Railway, SQLite locally
+if dj_database_url:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=config('DATABASE_URL', default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Fallback to SQLite if dj_database_url is not available
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -90,8 +114,9 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files
 MEDIA_URL = '/media/'
@@ -117,9 +142,20 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+# Add Railway frontend domain if set
+if config('FRONTEND_URL', default=None):
+    CORS_ALLOWED_ORIGINS.append(config('FRONTEND_URL'))
+# Add additional allowed origins from environment variable (comma-separated)
+if config('CORS_ALLOWED_ORIGINS', default=None):
+    additional_origins = [origin.strip() for origin in config('CORS_ALLOWED_ORIGINS').split(',')]
+    CORS_ALLOWED_ORIGINS.extend(additional_origins)
+# Allow all origins in development (you can restrict this in production)
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOW_CREDENTIALS = True
 
 # Firebase settings
 FIREBASE_CREDENTIALS_PATH = config('FIREBASE_CREDENTIALS_PATH', default='')
-

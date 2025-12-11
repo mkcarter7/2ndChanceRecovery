@@ -60,3 +60,6 @@ dist/
 # OS
 Thumbs.db
 desktop.ini
+
+# Internal documentation (not for public GitHub)
+PROJECT_DETAILS.md
