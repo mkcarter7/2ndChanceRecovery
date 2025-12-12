@@ -13,9 +13,11 @@ Before you begin, make sure you have:
 
 ---
 
-## Part 1: Backend Service Setup
+## Part 1: Frontend Service Setup (Deploy First!)
 
-### Step 1: Create Railway Project and Add Backend Service
+> **💡 Why deploy frontend first?** You'll need the frontend URL to configure CORS in the backend. Deploying frontend first ensures you have that URL ready.
+
+### Step 1: Create Railway Project and Add Frontend Service
 
 1. Go to https://railway.app and sign in
 2. Click **"New Project"**
@@ -23,118 +25,10 @@ Before you begin, make sure you have:
 4. Choose your `2ndChanceRecovery` repository
 5. Railway will create a new service automatically
 6. **Important:** Click on the service, then go to **Settings** → **Root Directory**
-7. Set the root directory to: `backend`
-8. Railway will automatically detect it's a Django project using the `nixpacks.toml` file
+7. Set the root directory to: `frontend`
+8. Railway will detect it's a React app using the `nixpacks.toml` file
 
-### Step 2: Add PostgreSQL Database
-
-1. In your Railway project dashboard, click **"New"** button
-2. Select **"Database"** → **"Add PostgreSQL"**
-3. Railway will automatically create a PostgreSQL database
-4. The `DATABASE_URL` environment variable will be automatically set and shared with your backend service
-5. **Note:** You don't need to manually set `DATABASE_URL` - Railway handles this automatically
-
-### Step 3: Configure Backend Environment Variables
-
-1. Click on your **backend service** in Railway
-2. Go to the **"Variables"** tab
-3. Add the following environment variables:
-
-#### ✅ Required Variables
-
-- **`SECRET_KEY`**
-  - Value: Generate a strong random key
-  - How to generate: Run `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`
-
-- **`DEBUG`**
-  - Value: `False`
-  - Note: Always set to `False` in production
-
-- **`FIREBASE_CREDENTIALS_PATH`**
-  - Value: `firebase-credentials.json`
-  - Note: Path to Firebase credentials file
-
-#### ⚠️ Optional Variables (for custom domain and CORS)
-
-- **`RAILWAY_PUBLIC_DOMAIN`**
-  - Value: `your-backend.railway.app`
-  - Note: Your Railway-generated domain (set after first deploy)
-
-- **`CUSTOM_DOMAIN`**
-  - Value: `api.yourdomain.com`
-  - Note: Your custom domain (if using)
-
-- **`FRONTEND_URL`**
-  - Value: `https://your-frontend.railway.app`
-  - Note: Frontend URL for CORS (set after frontend deploy)
-
-- **`CORS_ALLOWED_ORIGINS`**
-  - Value: Comma-separated list of allowed origins (e.g., `https://app1.com,https://app2.com`)
-  - Note: Additional CORS origins beyond FRONTEND_URL (optional)
-
-### Step 4: Upload Firebase Credentials
-
-You have two options for Firebase credentials:
-
-#### Option A: Upload as File (Recommended)
-
-1. In your backend service, go to the **"Files"** tab
-2. Click **"Upload File"** or drag and drop
-3. Upload your `firebase-credentials.json` file from your local computer
-4. The file will be available at the root of your backend directory
-5. Make sure `FIREBASE_CREDENTIALS_PATH=firebase-credentials.json` is set in Variables
-
-#### Option B: Paste JSON as Environment Variable
-
-1. Open your local `firebase-credentials.json` file
-2. Copy the entire JSON file content (all the text inside the file)
-3. In Railway Variables (backend service), add:
-   - **Key:** `FIREBASE_CREDENTIALS_JSON`
-   - **Value:** Paste the entire JSON file content here
-4. You'll need to update your code to read from this variable (not currently implemented)
-
-> **💡 Recommendation:** Use Option A (file upload) as it's simpler and already supported by your code.
-
-### Step 5: Deploy Backend
-
-Railway will automatically start deploying when you:
-- Connect the repository
-- Set the root directory
-- Push changes to your GitHub repository
-
-**Deployment process:**
-1. ✅ Install Python dependencies from `requirements.txt`
-2. ✅ Run database migrations automatically (via `nixpacks.toml`)
-3. ✅ Collect static files automatically
-4. ✅ Start the server using Gunicorn
-
-**After deployment:**
-- Monitor the deployment in the **"Deployments"** tab
-- Once deployed, Railway will provide a public URL (e.g., `your-backend.railway.app`)
-- **📋 Copy this URL** - you'll need it for the frontend configuration
-
-### Step 6: Verify Backend Deployment
-
-1. Visit your backend URL: `https://your-backend.railway.app/admin`
-2. You should see the Django admin login page (or API endpoints if configured)
-3. Check the **"Logs"** tab for any errors
-4. If you see database errors, you may need to run migrations manually (see Troubleshooting)
-
----
-
-## Part 2: Frontend Service Setup
-
-### Step 7: Add Frontend Service
-
-1. In your Railway project dashboard, click **"New"** button
-2. Select **"GitHub Repo"**
-3. Choose the **same repository** (`2ndChanceRecovery`)
-4. Railway will create a new service
-5. Click on the new service, go to **Settings** → **Root Directory**
-6. Set the root directory to: `frontend`
-7. Railway will detect it's a React app using the `nixpacks.toml` file
-
-### Step 8: Configure Frontend Environment Variables
+### Step 2: Configure Frontend Environment Variables
 
 1. Click on your **frontend service** in Railway
 2. Go to the **"Variables"** tab
@@ -143,8 +37,8 @@ Railway will automatically start deploying when you:
 #### ✅ Required Variables
 
 - **`REACT_APP_API_URL`**
-  - Value: `https://your-backend.railway.app/api`
-  - Note: Replace with your actual backend URL from Step 5
+  - Value: `https://placeholder-backend.railway.app/api` (we'll update this after backend deploys)
+  - Note: You'll update this with the actual backend URL after deploying the backend
 
 - **`REACT_APP_FIREBASE_API_KEY`**
   - Value: Your Firebase API Key
@@ -178,7 +72,7 @@ Railway will automatically start deploying when you:
 > 5. Click on the web app (or create one)
 > 6. Copy the configuration values
 
-### Step 9: Deploy Frontend
+### Step 3: Deploy Frontend
 
 Railway will automatically start deploying.
 
@@ -190,12 +84,138 @@ Railway will automatically start deploying.
 **After deployment:**
 - Monitor the deployment in the **"Deployments"** tab
 - Once deployed, Railway will provide a public URL (e.g., `your-frontend.railway.app`)
-- **📋 Update backend CORS settings:**
-  - Go back to your backend service
-  - Add/update the `FRONTEND_URL` variable with your frontend URL
-  - Redeploy the backend if needed
+- **📋 Copy this URL** - you'll need it for the backend CORS configuration in the next part
 
-### Step 10: Verify Frontend Deployment
+### Step 4: Verify Frontend Deployment
+
+1. Visit your frontend URL: `https://your-frontend.railway.app`
+2. The React app should load (API calls may fail until backend is deployed - that's expected)
+3. Check Railway logs if there are build issues
+
+---
+
+## Part 2: Backend Service Setup
+
+### Step 5: Add Backend Service
+
+1. In your Railway project dashboard, click **"New"** button
+2. Select **"GitHub Repo"**
+3. Choose the **same repository** (`2ndChanceRecovery`)
+4. Railway will create a new service
+5. Click on the new service, go to **Settings** → **Root Directory**
+6. Set the root directory to: `backend`
+7. Railway will automatically detect it's a Django project using the `nixpacks.toml` file
+
+### Step 6: Add PostgreSQL Database
+
+1. In your Railway project dashboard, click **"New"** button
+2. Select **"Database"** → **"Add PostgreSQL"**
+3. Railway will automatically create a PostgreSQL database
+4. **Connect the database to your backend:**
+   - Go to your **backend service** → **Variables** tab
+   - Click **"Add Variable"** or **"New Variable"**
+   - In the variable name field, type: `DATABASE_URL`
+   - Click **"Add Reference"** (or the dropdown arrow)
+   - Select `DATABASE_URL` from the PostgreSQL service
+   - Click **"Add"**
+5. The `DATABASE_URL` will now be connected to your backend service
+
+### Step 7: Configure Backend Environment Variables
+
+1. Click on your **backend service** in Railway
+2. Go to the **"Variables"** tab
+3. Add the following environment variables:
+
+#### ✅ Required Variables
+
+- **`SECRET_KEY`**
+  - Value: Generate a strong random key
+  - How to generate: Run `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`
+
+- **`DEBUG`**
+  - Value: `False`
+  - Note: Always set to `False` in production
+
+- **`FIREBASE_CREDENTIALS_PATH`**
+  - Value: `firebase-credentials.json`
+  - Note: Path to Firebase credentials file
+
+- **`FRONTEND_URL`**
+  - Value: `https://your-frontend.railway.app` (use the frontend URL from Step 4)
+  - Note: This is the frontend URL you copied after deploying the frontend
+
+#### ⚠️ Optional Variables (for custom domain and CORS)
+
+- **`RAILWAY_PUBLIC_DOMAIN`**
+  - Value: `your-backend.railway.app`
+  - Note: Your Railway-generated domain (set after first deploy)
+
+- **`CUSTOM_DOMAIN`**
+  - Value: `api.yourdomain.com`
+  - Note: Your custom domain (if using)
+
+- **`CORS_ALLOWED_ORIGINS`**
+  - Value: Comma-separated list of allowed origins (e.g., `https://app1.com,https://app2.com`)
+  - Note: Additional CORS origins beyond FRONTEND_URL (only if you have multiple frontends)
+
+### Step 8: Upload Firebase Credentials
+
+You have two options for Firebase credentials:
+
+#### Option A: Upload as File (Recommended)
+
+1. In your backend service, go to the **"Files"** tab
+2. Click **"Upload File"** or drag and drop
+3. Upload your `firebase-credentials.json` file from your local computer
+4. The file will be available at the root of your backend directory
+5. Make sure `FIREBASE_CREDENTIALS_PATH=firebase-credentials.json` is set in Variables
+
+#### Option B: Paste JSON as Environment Variable
+
+1. Open your local `firebase-credentials.json` file
+2. Copy the entire JSON file content (all the text inside the file)
+3. In Railway Variables (backend service), add:
+   - **Key:** `FIREBASE_CREDENTIALS_JSON`
+   - **Value:** Paste the entire JSON file content here
+4. You'll need to update your code to read from this variable (not currently implemented)
+
+> **💡 Recommendation:** Use Option A (file upload) as it's simpler and already supported by your code.
+
+### Step 9: Deploy Backend
+
+Railway will automatically start deploying when you:
+- Connect the repository
+- Set the root directory
+- Push changes to your GitHub repository
+
+**Deployment process:**
+1. ✅ Install Python dependencies from `requirements.txt`
+2. ✅ Run database migrations automatically (via `nixpacks.toml`)
+3. ✅ Collect static files automatically
+4. ✅ Start the server using Gunicorn
+
+**After deployment:**
+- Monitor the deployment in the **"Deployments"** tab
+- Once deployed, Railway will provide a public URL (e.g., `your-backend.railway.app`)
+- **📋 Copy this backend URL** - you'll need it to update the frontend
+
+### Step 10: Update Frontend with Backend URL
+
+1. Go back to your **frontend service** in Railway
+2. Go to **Variables** tab
+3. Update the `REACT_APP_API_URL` variable:
+   - Change from: `https://placeholder-backend.railway.app/api`
+   - Change to: `https://your-actual-backend.railway.app/api` (use the backend URL from Step 9)
+4. Railway will automatically rebuild the frontend with the new API URL
+
+### Step 11: Verify Backend Deployment
+
+1. Visit your backend URL: `https://your-backend.railway.app/admin`
+2. You should see the Django admin login page (or API endpoints if configured)
+3. Check the **"Logs"** tab for any errors
+4. If you see database errors, you may need to run migrations manually (see Troubleshooting)
+
+### Step 12: Verify Full Stack
 
 1. Visit your frontend URL: `https://your-frontend.railway.app`
 2. The React app should load
