@@ -99,7 +99,7 @@ const Home = () => {
       <section 
         className={`hero ${hasBackgroundImage ? 'has-background-image' : ''}`}
         style={{
-          backgroundColor: settings.background_color,
+          backgroundColor: hasBackgroundImage ? 'transparent' : settings.background_color,
           backgroundImage: backgroundImageUrl,
           WebkitBackgroundSize: 'cover',
           backgroundSize: 'cover',
