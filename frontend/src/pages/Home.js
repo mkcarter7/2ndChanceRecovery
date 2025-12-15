@@ -61,8 +61,8 @@ const Home = () => {
         : `${baseUrl}/${settings.background_image}`;
     }
     
-    // Return with proper URL formatting for CSS
-    return imageUrl ? `url("${imageUrl}")` : 'none';
+    // Return with proper URL formatting for CSS - use single quotes for better mobile compatibility
+    return imageUrl ? `url('${imageUrl}')` : 'none';
   };
 
   return (

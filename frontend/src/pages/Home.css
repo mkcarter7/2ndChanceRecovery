@@ -23,11 +23,12 @@
   background-color: rgba(255, 255, 255, 0.8);
   z-index: 0;
   transition: background-color 0.3s ease;
+  pointer-events: none; /* Allow clicks to pass through */
 }
 
 /* Reduce overlay opacity when background image is present */
 .hero.has-background-image::before {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0);
 }
 
 .hero .container {
