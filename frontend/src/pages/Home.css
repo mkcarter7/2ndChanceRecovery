@@ -254,8 +254,13 @@
   }
 
   .hero-subtitle {
-    font-size: 1.1rem;
-    padding: 0 15px;
+    font-size: 1.1rem !important;
+    padding: 0.75rem 1.25rem !important;
+    margin: 0 auto 1.5rem !important;
+    display: inline-block !important;
+    max-width: 90% !important;
+    text-align: center !important;
+    font-size: 1rem !important;
   }
 
   .hero-buttons {
@@ -263,11 +268,14 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0 15px;
+    width: 100%;
   }
   
   .hero-buttons .btn {
-    width: 100%;
-    max-width: 280px;
+    width: 100% !important;
+    max-width: 280px !important;
+    font-size: 1rem !important;
+    padding: 12px 24px !important;
   }
 
   .links-grid,
@@ -316,8 +324,19 @@
   }
 
   .hero-subtitle {
-    font-size: 1rem;
-    padding: 0 10px;
+    font-size: 0.95rem !important;
+    padding: 0.6rem 1rem !important;
+    margin: 0 auto 1.25rem !important;
+    display: inline-block !important;
+    max-width: 95% !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+  }
+  
+  .hero-buttons .btn {
+    font-size: 0.95rem !important;
+    padding: 11px 20px !important;
+    min-width: 140px !important;
   }
   
   .link-card {
