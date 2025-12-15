@@ -9,6 +9,7 @@ from django.http import JsonResponse, FileResponse, Http404
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import cache_control
 import os
+import mimetypes
 
 @require_http_methods(["GET"])
 def api_root(request):
@@ -23,7 +24,11 @@ def serve_media(request, path):
     """Serve media files in production"""
     file_path = os.path.join(settings.MEDIA_ROOT, path)
     if os.path.exists(file_path) and os.path.isfile(file_path):
-        return FileResponse(open(file_path, 'rb'), content_type='application/octet-stream')
+        # Detect content type based on file extension
+        content_type, _ = mimetypes.guess_type(file_path)
+        if not content_type:
+            content_type = 'application/octet-stream'
+        return FileResponse(open(file_path, 'rb'), content_type=content_type)
     raise Http404("File not found")
 
 urlpatterns = [
