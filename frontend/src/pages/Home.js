@@ -77,7 +77,7 @@ const Home = () => {
             <h1 style={{ color: settings.primary_color }}>
               {settings.hero_title}
             </h1>
-            <p className="hero-subtitle" style={{ color: settings.secondary_color }}>
+            <p className="hero-subtitle">
               {settings.hero_subtitle}
             </p>
             <div className="hero-buttons">
