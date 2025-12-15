@@ -18,17 +18,46 @@ const Login = () => {
     if (result.success) {
       navigate('/admin');
     } else {
-      // Provide user-friendly error messages
+      // Provide user-friendly error messages with more details
       let errorMessage = 'Failed to sign in. Please try again.';
-      if (result.error) {
+      
+      if (result.code) {
+        // Handle specific Firebase error codes
+        switch (result.code) {
+          case 'auth/popup-closed-by-user':
+            errorMessage = 'Sign-in was cancelled. Please try again.';
+            break;
+          case 'auth/account-exists-with-different-credential':
+            errorMessage = 'An account already exists with this email.';
+            break;
+          case 'auth/unauthorized-domain':
+            errorMessage = 'This domain is not authorized. Please contact the administrator.';
+            break;
+          case 'auth/operation-not-allowed':
+            errorMessage = 'Google sign-in is not enabled. Please contact the administrator.';
+            break;
+          case 'auth/invalid-api-key':
+            errorMessage = 'Invalid API key. Please contact the administrator.';
+            break;
+          default:
+            errorMessage = result.error || `Error: ${result.code}`;
+        }
+      } else if (result.error) {
+        // Fallback to error message parsing
         if (result.error.includes('popup-closed-by-user')) {
           errorMessage = 'Sign-in was cancelled. Please try again.';
         } else if (result.error.includes('account-exists-with-different-credential')) {
           errorMessage = 'An account already exists with this email.';
+        } else if (result.error.includes('unauthorized-domain')) {
+          errorMessage = 'This domain is not authorized. Please add this domain to Firebase authorized domains.';
         } else {
           errorMessage = result.error;
         }
       }
+      
+      // Log full error for debugging
+      console.error('Login error details:', result);
+      
       setError(errorMessage);
     }
     

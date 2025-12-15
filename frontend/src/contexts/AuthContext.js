@@ -46,12 +46,26 @@ export const AuthProvider = ({ children }) => {
   const loginWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      // Add additional scopes if needed
+      provider.addScope('email');
+      provider.addScope('profile');
+      
       const userCredential = await signInWithPopup(auth, provider);
       const token = await getIdToken(userCredential.user);
       localStorage.setItem('firebaseToken', token);
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      // Log full error details for debugging
+      console.error('Firebase login error:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      
+      // Return more detailed error information
+      return { 
+        success: false, 
+        error: error.message,
+        code: error.code 
+      };
     }
   };
 
