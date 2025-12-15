@@ -70,9 +70,25 @@ const Home = () => {
   
   // Extract the actual URL from the CSS url() format for iOS img fallback
   const getImageUrlForIOS = () => {
-    if (!hasBackgroundImage) return null;
+    if (!hasBackgroundImage || !settings.background_image) return null;
+    
+    // If it's already a full URL, use it directly
+    if (settings.background_image.startsWith('http://') || settings.background_image.startsWith('https://')) {
+      return settings.background_image;
+    }
+    
+    // Extract from CSS url() format or construct from relative path
     const urlMatch = backgroundImageUrl.match(/url\(['"]?([^'"]+)['"]?\)/);
-    return urlMatch ? urlMatch[1] : null;
+    if (urlMatch) {
+      return urlMatch[1];
+    }
+    
+    // Fallback: construct URL from settings
+    const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+    const baseUrl = apiBaseUrl.replace(/\/api$/, '');
+    return settings.background_image.startsWith('/') 
+      ? `${baseUrl}${settings.background_image}`
+      : `${baseUrl}/${settings.background_image}`;
   };
   
   const imageUrlForIOS = getImageUrlForIOS();
