@@ -144,7 +144,11 @@ CORS_ALLOWED_ORIGINS = [
 ]
 # Add Railway frontend domain if set
 if config('FRONTEND_URL', default=None):
-    CORS_ALLOWED_ORIGINS.append(config('FRONTEND_URL'))
+    frontend_url = config('FRONTEND_URL').strip()
+    # Add https:// if no scheme is provided
+    if frontend_url and not frontend_url.startswith(('http://', 'https://')):
+        frontend_url = f'https://{frontend_url}'
+    CORS_ALLOWED_ORIGINS.append(frontend_url)
 # Add additional allowed origins from environment variable (comma-separated)
 if config('CORS_ALLOWED_ORIGINS', default=None):
     additional_origins = []
