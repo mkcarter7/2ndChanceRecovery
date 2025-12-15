@@ -738,10 +738,18 @@ const SettingsTab = ({ settings, onSave, editing, setEditing }) => {
     setFormData(settings);
     // Set preview if there's an existing image
     if (settings.background_image && typeof settings.background_image === 'string') {
-      const apiBaseUrl = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000';
-      const imageUrl = settings.background_image.startsWith('http') 
-        ? settings.background_image 
-        : `${apiBaseUrl}${settings.background_image}`;
+      let imageUrl;
+      if (settings.background_image.startsWith('http://') || settings.background_image.startsWith('https://')) {
+        // Already a full URL
+        imageUrl = settings.background_image;
+      } else {
+        // Construct full URL from relative path
+        const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+        const baseUrl = apiBaseUrl.replace(/\/api$/, '');
+        imageUrl = settings.background_image.startsWith('/') 
+          ? `${baseUrl}${settings.background_image}`
+          : `${baseUrl}/${settings.background_image}`;
+      }
       setImagePreview(imageUrl);
     } else {
       setImagePreview(null);
@@ -818,13 +826,30 @@ const SettingsTab = ({ settings, onSave, editing, setEditing }) => {
             <strong>Background Image:</strong>
             {settings.background_image ? (
               <div style={{ marginTop: '10px' }}>
-                <img 
-                  src={settings.background_image.startsWith('http') 
-                    ? settings.background_image 
-                    : `${process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:8000'}${settings.background_image}`}
-                  alt="Background preview" 
-                  style={{ maxWidth: '300px', maxHeight: '200px', borderRadius: '5px', border: '1px solid #ddd' }}
-                />
+                {(() => {
+                  let imageUrl;
+                  if (settings.background_image.startsWith('http://') || settings.background_image.startsWith('https://')) {
+                    imageUrl = settings.background_image;
+                  } else {
+                    const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+                    const baseUrl = apiBaseUrl.replace(/\/api$/, '');
+                    imageUrl = settings.background_image.startsWith('/') 
+                      ? `${baseUrl}${settings.background_image}`
+                      : `${baseUrl}/${settings.background_image}`;
+                  }
+                  return (
+                    <img 
+                      src={imageUrl}
+                      alt="Background preview" 
+                      style={{ maxWidth: '300px', maxHeight: '200px', borderRadius: '5px', border: '1px solid #ddd', display: 'block' }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'block';
+                      }}
+                    />
+                  );
+                })()}
+                <span style={{ display: 'none', color: '#999' }}>Image failed to load</span>
               </div>
             ) : (
               <span style={{ color: '#999' }}>No background image set</span>
@@ -906,8 +931,14 @@ const SettingsTab = ({ settings, onSave, editing, setEditing }) => {
               <img 
                 src={imagePreview} 
                 alt="Preview" 
-                style={{ maxWidth: '300px', maxHeight: '200px', borderRadius: '5px', border: '1px solid #ddd', marginTop: '10px' }}
+                style={{ maxWidth: '300px', maxHeight: '200px', borderRadius: '5px', border: '1px solid #ddd', marginTop: '10px', display: 'block' }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  const errorMsg = e.target.nextElementSibling;
+                  if (errorMsg) errorMsg.style.display = 'block';
+                }}
               />
+              <span style={{ display: 'none', color: '#dc143c', fontSize: '0.9rem' }}>Failed to load image preview</span>
               <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '5px' }}>
                 {formData.background_image instanceof File ? formData.background_image.name : 'Current image'}
               </p>
