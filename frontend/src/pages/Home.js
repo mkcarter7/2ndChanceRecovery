@@ -16,9 +16,21 @@ const Home = () => {
   const fetchFeaturedReviews = async () => {
     try {
       const response = await api.get('/reviews/featured/');
-      setReviews(response.data);
+      // Ensure reviews is always an array
+      const reviewsData = response.data;
+      if (Array.isArray(reviewsData)) {
+        setReviews(reviewsData);
+      } else if (reviewsData && Array.isArray(reviewsData.results)) {
+        // Handle paginated response
+        setReviews(reviewsData.results);
+      } else {
+        // Fallback to empty array if data is not in expected format
+        console.warn('Reviews data is not in expected format:', reviewsData);
+        setReviews([]);
+      }
     } catch (error) {
       console.error('Error fetching reviews:', error);
+      setReviews([]); // Set to empty array on error
     } finally {
       setLoading(false);
     }
@@ -98,7 +110,7 @@ const Home = () => {
             <p style={{ textAlign: 'center', color: settings.secondary_color }}>
               Loading reviews...
             </p>
-          ) : reviews.length > 0 ? (
+          ) : Array.isArray(reviews) && reviews.length > 0 ? (
             <div className="reviews-grid">
               {reviews.map((review) => (
                 <div key={review.id} className="review-card">
