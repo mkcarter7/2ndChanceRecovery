@@ -46,20 +46,23 @@ const Home = () => {
   const getBackgroundImageUrl = () => {
     if (!settings.background_image) return 'none';
     
+    let imageUrl;
+    
     // If it's already a full URL (starts with http:// or https://), use it as is
     if (settings.background_image.startsWith('http://') || settings.background_image.startsWith('https://')) {
-      return `url(${settings.background_image})`;
+      imageUrl = settings.background_image;
+    } else {
+      // If it's a relative path, construct the full URL using API base URL
+      const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      // Remove /api from the end if present, since media files are served from root
+      const baseUrl = apiBaseUrl.replace(/\/api$/, '');
+      imageUrl = settings.background_image.startsWith('/') 
+        ? `${baseUrl}${settings.background_image}`
+        : `${baseUrl}/${settings.background_image}`;
     }
     
-    // If it's a relative path, construct the full URL using API base URL
-    const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-    // Remove /api from the end if present, since media files are served from root
-    const baseUrl = apiBaseUrl.replace(/\/api$/, '');
-    const imageUrl = settings.background_image.startsWith('/') 
-      ? `${baseUrl}${settings.background_image}`
-      : `${baseUrl}/${settings.background_image}`;
-    
-    return `url(${imageUrl})`;
+    // Return with proper URL formatting for CSS
+    return imageUrl ? `url("${imageUrl}")` : 'none';
   };
 
   return (
