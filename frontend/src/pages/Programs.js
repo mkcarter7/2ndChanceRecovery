@@ -23,7 +23,7 @@ const Programs = () => {
       setPrograms(programsRes.data);
       setHousing(housingRes.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // Silently handle error
     } finally {
       setLoading(false);
     }

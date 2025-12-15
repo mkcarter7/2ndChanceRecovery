@@ -25,11 +25,9 @@ const Home = () => {
         setReviews(reviewsData.results);
       } else {
         // Fallback to empty array if data is not in expected format
-        console.warn('Reviews data is not in expected format:', reviewsData);
         setReviews([]);
       }
     } catch (error) {
-      console.error('Error fetching reviews:', error);
       setReviews([]); // Set to empty array on error
     } finally {
       setLoading(false);

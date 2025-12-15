@@ -38,7 +38,6 @@ const Admin = () => {
       setPrograms(Array.isArray(programsRes.data) ? programsRes.data : (programsRes.data.results || []));
       setHousing(Array.isArray(housingRes.data) ? housingRes.data : (housingRes.data.results || []));
     } catch (error) {
-      console.error('Error fetching data:', error);
       // Set empty arrays on error to prevent map errors
       setContactForms([]);
       setReviews([]);
@@ -55,7 +54,6 @@ const Admin = () => {
         await api.delete(`/contact-forms/${id}/`);
         setContactForms(contactForms.filter(form => form.id !== id));
       } catch (error) {
-        console.error('Error deleting form:', error);
         alert('Error deleting form');
       }
     }
@@ -67,7 +65,6 @@ const Admin = () => {
       setContactForms(contactForms.map(form => form.id === id ? response.data : form));
       setEditingItem(null);
     } catch (error) {
-      console.error('Error updating form:', error);
       alert('Error updating form');
     }
   };
@@ -78,7 +75,6 @@ const Admin = () => {
         await api.delete(`/reviews/${id}/`);
         setReviews(reviews.filter(review => review.id !== id));
       } catch (error) {
-        console.error('Error deleting review:', error);
         alert('Error deleting review');
       }
     }
@@ -90,7 +86,6 @@ const Admin = () => {
       setReviews(reviews.map(review => review.id === id ? response.data : review));
       setEditingItem(null);
     } catch (error) {
-      console.error('Error updating review:', error);
       alert('Error updating review');
     }
   };
@@ -101,7 +96,6 @@ const Admin = () => {
         await api.delete(`/programs/${id}/`);
         setPrograms(programs.filter(program => program.id !== id));
       } catch (error) {
-        console.error('Error deleting program:', error);
         alert('Error deleting program');
       }
     }
@@ -113,7 +107,6 @@ const Admin = () => {
       setPrograms(programs.map(program => program.id === id ? response.data : program));
       setEditingItem(null);
     } catch (error) {
-      console.error('Error updating program:', error);
       alert('Error updating program');
     }
   };
@@ -124,7 +117,6 @@ const Admin = () => {
       setPrograms([...programs, response.data]);
       setEditingItem(null);
     } catch (error) {
-      console.error('Error creating program:', error);
       alert('Error creating program');
     }
   };
@@ -135,7 +127,6 @@ const Admin = () => {
         await api.delete(`/housing/${id}/`);
         setHousing(housing.filter(h => h.id !== id));
       } catch (error) {
-        console.error('Error deleting housing:', error);
         alert('Error deleting housing');
       }
     }
@@ -147,7 +138,6 @@ const Admin = () => {
       setHousing(housing.map(h => h.id === id ? response.data : h));
       setEditingItem(null);
     } catch (error) {
-      console.error('Error updating housing:', error);
       alert('Error updating housing');
     }
   };
@@ -158,7 +148,6 @@ const Admin = () => {
       setHousing([...housing, response.data]);
       setEditingItem(null);
     } catch (error) {
-      console.error('Error creating housing:', error);
       alert('Error creating housing');
     }
   };
@@ -171,12 +160,10 @@ const Admin = () => {
         alert('Settings updated successfully!');
       } else {
         const errorMsg = result.error || 'Unknown error occurred';
-        console.error('Settings update error:', errorMsg);
         alert(`Error updating settings: ${errorMsg}`);
       }
     } catch (error) {
-      console.error('Settings update exception:', error);
-      alert(`Error updating settings: ${error.message || 'Please check the console for details'}`);
+      alert(`Error updating settings: ${error.message || 'Unknown error occurred'}`);
     }
   };
 
@@ -184,8 +171,6 @@ const Admin = () => {
     const result = await logout();
     if (result.success) {
       navigate('/');
-    } else {
-      console.error('Logout error:', result.error);
     }
   };
 

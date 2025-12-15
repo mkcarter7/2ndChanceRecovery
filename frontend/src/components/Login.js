@@ -55,9 +55,6 @@ const Login = () => {
         }
       }
       
-      // Log full error for debugging
-      console.error('Login error details:', result);
-      
       setError(errorMessage);
     }
     

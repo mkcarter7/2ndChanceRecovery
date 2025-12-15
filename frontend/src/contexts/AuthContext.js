@@ -30,7 +30,6 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('firebaseToken', token);
           setCurrentUser(user);
         } catch (error) {
-          console.error('Error getting token:', error);
           setCurrentUser(null);
         }
       } else {
@@ -55,11 +54,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('firebaseToken', token);
       return { success: true };
     } catch (error) {
-      // Log full error details for debugging
-      console.error('Firebase login error:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
-      
       // Return more detailed error information
       return { 
         success: false, 

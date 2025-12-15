@@ -42,7 +42,7 @@ export const SettingsProvider = ({ children }) => {
       setSettings(response.data);
       applyTheme(response.data);
     } catch (error) {
-      console.error('Error fetching settings:', error);
+      // Silently handle error - settings will use defaults
     } finally {
       setLoading(false);
     }
@@ -88,7 +88,6 @@ export const SettingsProvider = ({ children }) => {
         // Validate API URL is set and is a full URL (not relative)
         if (window.location.hostname !== 'localhost') {
           if (!process.env.REACT_APP_API_URL) {
-            console.error('REACT_APP_API_URL is not set! API requests will fail.');
             return { 
               success: false, 
               error: 'API URL not configured. Please set REACT_APP_API_URL in Railway environment variables and trigger a new deployment.' 
@@ -97,8 +96,6 @@ export const SettingsProvider = ({ children }) => {
           
           // Check if it's a relative path (starts with /)
           if (API_BASE_URL.startsWith('/')) {
-            console.error('REACT_APP_API_URL appears to be a relative path:', API_BASE_URL);
-            console.error('It must be a full URL like: https://your-backend.up.railway.app/api');
             return { 
               success: false, 
               error: 'REACT_APP_API_URL must be a full URL (starting with http:// or https://), not a relative path.' 
@@ -107,7 +104,6 @@ export const SettingsProvider = ({ children }) => {
           
           // Ensure it starts with http:// or https://
           if (!API_BASE_URL.startsWith('http://') && !API_BASE_URL.startsWith('https://')) {
-            console.error('REACT_APP_API_URL must start with http:// or https://:', API_BASE_URL);
             return { 
               success: false, 
               error: 'REACT_APP_API_URL must be a full URL starting with http:// or https://' 
@@ -134,7 +130,7 @@ export const SettingsProvider = ({ children }) => {
         return { success: true };
       }
     } catch (error) {
-      console.error('Error updating settings:', error);
+      // Error handled and returned to caller
       let errorMessage = 'Unknown error occurred';
       
       if (error.response) {

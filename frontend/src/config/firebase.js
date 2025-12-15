@@ -24,18 +24,12 @@ const requiredEnvVars = [
 
 const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
-if (missingVars.length > 0) {
-  console.error('Missing Firebase environment variables:', missingVars.join(', '));
-  console.error('Please set these variables in Railway for the frontend service.');
-}
-
 // Initialize Firebase
 let app;
 try {
   app = initializeApp(firebaseConfig);
 } catch (error) {
-  console.error('Firebase initialization error:', error);
-  console.error('Please check that all Firebase environment variables are set correctly in Railway.');
+  // Re-throw error - it will be caught by error boundaries or calling code
   throw error;
 }
 
