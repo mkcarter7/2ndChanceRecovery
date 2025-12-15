@@ -39,10 +39,40 @@ Set these in Railway for your **backend service**:
 1. `SECRET_KEY` - Django secret key
 2. `DEBUG` - Set to `False` for production
 3. `DATABASE_URL` - PostgreSQL connection string (Railway usually sets this automatically)
-4. `FIREBASE_CREDENTIALS_PATH` - Path to Firebase credentials JSON file (if using file-based credentials)
+4. `FIREBASE_CREDENTIALS_PATH` - Path to Firebase credentials JSON file (see Firebase Setup below)
 5. `FRONTEND_URL` - Frontend URL for CORS (e.g., `https://your-frontend.railway.app`)
 6. `CUSTOM_DOMAIN` - (Optional) Custom domain if you have one
 7. `RAILWAY_PUBLIC_DOMAIN` - (Optional) Railway public domain
+
+## Firebase Backend Setup (IMPORTANT)
+
+The backend must use the **same Firebase project** as the frontend. If you see an error like "Expected 'railway-infra' but got 'ndchancerecovery'", your backend is using the wrong Firebase credentials.
+
+### Option 1: Upload Firebase Credentials File (Recommended)
+
+1. **Get Firebase Service Account Key:**
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Select your project (e.g., "ndchancerecovery")
+   - Click the gear icon ⚙️ → "Project settings"
+   - Go to "Service accounts" tab
+   - Click "Generate new private key"
+   - Download the JSON file (e.g., `ndchancerecovery-firebase-adminsdk-xxxxx.json`)
+
+2. **Upload to Railway:**
+   - Go to your Railway backend service
+   - Go to the "Variables" tab
+   - Click "New Variable" → "New File"
+   - Name: `FIREBASE_CREDENTIALS`
+   - Upload the JSON file you downloaded
+   - Railway will store it and provide a path
+
+3. **Set the Path:**
+   - Add another variable: `FIREBASE_CREDENTIALS_PATH`
+   - Value: `/app/FIREBASE_CREDENTIALS` (or whatever path Railway provides)
+
+### Option 2: Use Environment Variables
+
+Instead of a file, you can set Firebase credentials as environment variables. This requires modifying the authentication code to read from environment variables instead of a file.
 
 ## Getting Firebase Configuration Values
 
