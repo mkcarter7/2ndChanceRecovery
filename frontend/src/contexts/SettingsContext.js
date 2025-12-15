@@ -79,10 +79,16 @@ export const SettingsProvider = ({ children }) => {
             }
             // If it's a string (URL), don't include it (backend keeps existing)
           } else {
-            // Convert non-file values to strings
-            const value = newSettings[key];
-            if (value !== null && value !== undefined) {
-              formData.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
+            // Handle social media URLs: send empty string for null values so backend can clear them
+            const socialMediaFields = ['facebook_url', 'instagram_url', 'twitter_url', 'linkedin_url', 'youtube_url', 'tiktok_url'];
+            if (socialMediaFields.includes(key) && newSettings[key] === null) {
+              formData.append(key, '');
+            } else {
+              // Convert non-file values to strings
+              const value = newSettings[key];
+              if (value !== null && value !== undefined) {
+                formData.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
+              }
             }
           }
         });

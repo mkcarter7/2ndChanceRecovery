@@ -770,6 +770,14 @@ const SettingsTab = ({ settings, onSave, editing, setEditing }) => {
     }
     // If it's null or a File, keep it in dataToSave
     
+    // Handle social media URLs: convert empty strings to null so backend can clear them
+    const socialMediaFields = ['facebook_url', 'instagram_url', 'twitter_url', 'linkedin_url', 'youtube_url', 'tiktok_url'];
+    socialMediaFields.forEach(field => {
+      if (dataToSave[field] === '' || dataToSave[field] === undefined) {
+        dataToSave[field] = null;
+      }
+    });
+    
     onSave(dataToSave);
   };
 
