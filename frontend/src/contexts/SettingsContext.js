@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import api from '../config/api';
 
 const SettingsContext = createContext();
@@ -27,11 +27,15 @@ export const SettingsProvider = ({ children }) => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchSettings();
+  const applyTheme = useCallback((settings) => {
+    const root = document.documentElement;
+    root.style.setProperty('--primary-color', settings.primary_color || '#000000');
+    root.style.setProperty('--secondary-color', settings.secondary_color || '#808080');
+    root.style.setProperty('--accent-color', settings.accent_color || '#DC143C');
+    root.style.setProperty('--background-color', settings.background_color || '#FFFFFF');
   }, []);
 
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     try {
       const response = await api.get('/settings/public/');
       setSettings(response.data);
@@ -41,15 +45,11 @@ export const SettingsProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [applyTheme]);
 
-  const applyTheme = (settings) => {
-    const root = document.documentElement;
-    root.style.setProperty('--primary-color', settings.primary_color || '#000000');
-    root.style.setProperty('--secondary-color', settings.secondary_color || '#808080');
-    root.style.setProperty('--accent-color', settings.accent_color || '#DC143C');
-    root.style.setProperty('--background-color', settings.background_color || '#FFFFFF');
-  };
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
 
   const updateSettings = async (newSettings) => {
     try {
