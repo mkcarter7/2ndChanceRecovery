@@ -115,13 +115,13 @@ export const SettingsProvider = ({ children }) => {
           }
         }
         
-        // Log the URL being used for debugging
-        console.log('Making PATCH request to:', `${API_BASE_URL}/settings/1/`);
-        
         const headers = {};
         if (token) {
           headers['Authorization'] = `Bearer ${token}`;
         }
+        
+        // Log the URL being used for debugging (only after validation passes)
+        console.log('Making PATCH request to:', `${API_BASE_URL}/settings/1/`);
         
         // Use axios directly for FormData request
         response = await axios.patch(`${API_BASE_URL}/settings/1/`, formData, { headers });
