@@ -76,6 +76,24 @@ This means the Firebase environment variables are not set or are incorrect in Ra
 3. Trigger a new deployment after setting the variables
 4. Check the build logs to ensure variables are being read correctly
 
+### Error: "The requested action is invalid"
+
+This error occurs when your Railway domain is not authorized in Firebase Console.
+
+**Solution:**
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Select your project
+3. Click the gear icon ⚙️ next to "Project Overview"
+4. Select "Project settings"
+5. Scroll down to "Authorized domains" section
+6. Click "Add domain"
+7. Add your Railway domain: `frontend-production-f2a5.up.railway.app` (or whatever your Railway domain is)
+8. Also add `*.railway.app` to authorize all Railway subdomains
+9. Click "Add"
+10. Try logging in again
+
+**Important:** If you have a custom domain, make sure to add that as well.
+
 ### Variables Not Working After Setting Them
 
 React environment variables are embedded at **build time**, not runtime. You must:
