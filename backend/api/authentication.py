@@ -3,6 +3,7 @@ from rest_framework import exceptions
 import firebase_admin
 from firebase_admin import credentials, auth
 import os
+import json
 from django.conf import settings
 
 
@@ -21,11 +22,38 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             # Initialize Firebase Admin if not already initialized
             if not firebase_admin._apps:
                 cred_path = settings.FIREBASE_CREDENTIALS_PATH
-                if cred_path and os.path.exists(cred_path):
-                    cred = credentials.Certificate(cred_path)
-                    firebase_admin.initialize_app(cred)
+                
+                # Check if FIREBASE_CREDENTIALS_PATH is a JSON string (Railway format)
+                if cred_path:
+                    # Try to parse as JSON (Railway provides credentials as JSON in env var)
+                    try:
+                        if isinstance(cred_path, str):
+                            # Check if it's a JSON string
+                            if cred_path.strip().startswith('{'):
+                                cred_dict = json.loads(cred_path)
+                                cred = credentials.Certificate(cred_dict)
+                                firebase_admin.initialize_app(cred)
+                            # Check if it's a file path
+                            elif os.path.exists(cred_path):
+                                cred = credentials.Certificate(cred_path)
+                                firebase_admin.initialize_app(cred)
+                            else:
+                                # Fallback to default credentials
+                                firebase_admin.initialize_app()
+                        else:
+                            # It's already a dict (shouldn't happen but handle it)
+                            cred = credentials.Certificate(cred_path)
+                            firebase_admin.initialize_app(cred)
+                    except (json.JSONDecodeError, ValueError):
+                        # Not valid JSON, try as file path
+                        if os.path.exists(cred_path):
+                            cred = credentials.Certificate(cred_path)
+                            firebase_admin.initialize_app(cred)
+                        else:
+                            # Fallback to default credentials
+                            firebase_admin.initialize_app()
                 else:
-                    # Try default credentials
+                    # No credentials path set, use default (will use Railway's if available)
                     firebase_admin.initialize_app()
             
             # Verify the token
