@@ -12,6 +12,11 @@
   overflow: hidden;
 }
 
+/* Hide iOS img fallback on desktop (use CSS background) */
+.hero-background-image-ios {
+  display: none;
+}
+
 .hero::before {
   content: '';
   position: absolute;
