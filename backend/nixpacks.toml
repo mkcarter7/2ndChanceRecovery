@@ -14,4 +14,4 @@ cmds = [
 ]
 
 [start]
-cmd = "python manage.py migrate --noinput && python -m gunicorn recovery_center.wsgi --log-file - --bind 0.0.0.0:$PORT"
+cmd = "python3 manage.py migrate --noinput && python3 -m gunicorn recovery_center.wsgi --log-file - --bind 0.0.0.0:$PORT"
