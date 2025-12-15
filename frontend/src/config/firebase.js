@@ -22,8 +22,6 @@ const requiredEnvVars = [
   'REACT_APP_FIREBASE_APP_ID'
 ];
 
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-
 // Initialize Firebase
 let app;
 try {
