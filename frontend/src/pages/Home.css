@@ -490,6 +490,21 @@
     min-width: 140px !important;
   }
   
+  .hero-social-links {
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  
+  .hero-social-links a {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .hero-social-links a svg {
+    width: 20px;
+    height: 20px;
+  }
+  
   .link-card {
     padding: 1.25rem;
   }
