@@ -232,13 +232,12 @@ const Home = () => {
           <p style={{ color: '#FFFFFF', textAlign: 'center', marginBottom: '2rem' }}>
             Contact us today to learn more about our programs and take the first step.
           </p>
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{ textAlign: 'center' }}>
             <Link to="/contact" className="btn btn-secondary">
               Contact Us Now
             </Link>
-          </div>
-          {/* Social Media Links */}
-          <div className="cta-social-links">
+            {/* Social Media Links */}
+            <div className="cta-social-links">
             {hasValidUrl(settings.facebook_url) ? (
               <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
