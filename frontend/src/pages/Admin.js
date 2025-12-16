@@ -80,6 +80,16 @@ const Admin = () => {
     }
   };
 
+  const handleCreateReview = async (data) => {
+    try {
+      const response = await api.post('/reviews/', data);
+      setReviews([...reviews, response.data]);
+      setEditingItem(null);
+    } catch (error) {
+      alert('Error creating review');
+    }
+  };
+
   const handleUpdateReview = async (id, data) => {
     try {
       const response = await api.patch(`/reviews/${id}/`, data);
@@ -251,6 +261,7 @@ const Admin = () => {
               reviews={reviews}
               onDelete={handleDeleteReview}
               onUpdate={handleUpdateReview}
+              onCreate={handleCreateReview}
               editingItem={editingItem}
               setEditingItem={setEditingItem}
             />
@@ -373,7 +384,7 @@ const ContactFormsTab = ({ forms, onDelete, onUpdate, editingItem, setEditingIte
 };
 
 // Reviews Tab Component
-const ReviewsTab = ({ reviews, onDelete, onUpdate, editingItem, setEditingItem }) => {
+const ReviewsTab = ({ reviews, onDelete, onUpdate, onCreate, editingItem, setEditingItem }) => {
   const [formData, setFormData] = useState({});
 
   const handleEdit = (review) => {
@@ -388,15 +399,98 @@ const ReviewsTab = ({ reviews, onDelete, onUpdate, editingItem, setEditingItem }
     });
   };
 
-  const handleSave = (id) => {
-    onUpdate(id, formData);
+  const handleNew = () => {
+    setEditingItem('new');
+    setFormData({
+      author_name: '',
+      author_location: '',
+      rating: 5,
+      content: '',
+      is_approved: false,
+      is_featured: false,
+    });
   };
+
+  const handleSave = (id) => {
+    if (id === 'new') {
+      onCreate(formData);
+    } else {
+      onUpdate(id, formData);
+    }
+  };
+
+  // Ensure reviews is always an array
+  const reviewsArray = Array.isArray(reviews) ? reviews : [];
 
   return (
     <div className="admin-tab-content">
-      <h2>Reviews ({reviews.length})</h2>
+      <div className="admin-header-actions">
+        <h2>Reviews ({reviewsArray.length})</h2>
+        {editingItem !== 'new' && (
+          <button onClick={handleNew} className="btn btn-primary">Add New Review</button>
+        )}
+      </div>
+      
+      {/* New Review Form */}
+      {editingItem === 'new' && (
+        <div className="admin-card" style={{ marginBottom: '2rem' }}>
+          <div className="edit-form">
+            <h3>New Review</h3>
+            <input
+              type="text"
+              value={formData.author_name}
+              onChange={(e) => setFormData({...formData, author_name: e.target.value})}
+              placeholder="Author Name"
+            />
+            <input
+              type="text"
+              value={formData.author_location}
+              onChange={(e) => setFormData({...formData, author_location: e.target.value})}
+              placeholder="Location (optional)"
+            />
+            <label>
+              Rating (1-5):
+              <input
+                type="number"
+                min="1"
+                max="5"
+                value={formData.rating}
+                onChange={(e) => setFormData({...formData, rating: parseInt(e.target.value) || 5})}
+                placeholder="Rating"
+              />
+            </label>
+            <textarea
+              value={formData.content}
+              onChange={(e) => setFormData({...formData, content: e.target.value})}
+              placeholder="Review Content"
+              rows="4"
+            />
+            <label>
+              <input
+                type="checkbox"
+                checked={formData.is_approved}
+                onChange={(e) => setFormData({...formData, is_approved: e.target.checked})}
+              />
+              Approved
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={formData.is_featured}
+                onChange={(e) => setFormData({...formData, is_featured: e.target.checked})}
+              />
+              Featured (show on homepage)
+            </label>
+            <div className="edit-actions">
+              <button onClick={() => handleSave('new')} className="btn-small btn-primary">Create Review</button>
+              <button onClick={() => setEditingItem(null)} className="btn-small">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="admin-grid">
-        {reviews.map(review => (
+        {reviewsArray.map(review => (
           <div key={review.id} className="admin-card">
             {editingItem === review.id ? (
               <div className="edit-form">
