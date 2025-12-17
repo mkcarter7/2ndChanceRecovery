@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSettings } from '../contexts/SettingsContext';
 import api from '../config/api';
-import './Home.css';
 
 const Home = () => {
   const { settings } = useSettings();

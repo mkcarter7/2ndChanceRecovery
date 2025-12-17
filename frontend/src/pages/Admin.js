@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useSettings } from '../contexts/SettingsContext';
 import api from '../config/api';
-import './Admin.css';
 
 const Admin = () => {
   const { currentUser, logout } = useAuth();

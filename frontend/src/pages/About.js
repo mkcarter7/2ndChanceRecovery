@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSettings } from '../contexts/SettingsContext';
-import './About.css';
 
 const About = () => {
   const { settings } = useSettings();

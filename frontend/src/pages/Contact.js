@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useSettings } from '../contexts/SettingsContext';
 import api from '../config/api';
-import './Contact.css';
 
 const Contact = () => {
   const { settings } = useSettings();

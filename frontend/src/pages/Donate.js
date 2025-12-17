@@ -1,6 +1,5 @@
 import React from 'react';
 import { useSettings } from '../contexts/SettingsContext';
-import './Donate.css';
 
 const Donate = () => {
   const { settings } = useSettings();
