@@ -153,7 +153,7 @@ if USE_S3:
             'CacheControl': 'max-age=86400',
         }
         AWS_S3_FILE_OVERWRITE = False
-        AWS_DEFAULT_ACL = 'public-read'  # Make uploaded files publicly accessible
+        AWS_DEFAULT_ACL = None  # ACLs deprecated by AWS - use bucket policy instead
         AWS_QUERYSTRING_AUTH = False
         AWS_S3_VERIFY = True
         
