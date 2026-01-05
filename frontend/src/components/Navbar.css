@@ -34,7 +34,7 @@
 }
 
 .navbar-logo-text {
-  display: inline;
+  display: inline-block;
   color: #FFFFFF;
 }
 

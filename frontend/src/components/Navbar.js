@@ -38,19 +38,14 @@ const Navbar = () => {
           <Link to="/" className="navbar-logo">
             <img 
               src="/logo.jpg" 
-              alt={settings.site_name} 
+              alt="" 
               className="navbar-logo-img"
               onError={(e) => {
                 console.error('Logo failed to load:', e.target.src);
                 e.target.style.display = 'none';
-                // Show text fallback if image fails
-                const fallback = e.target.nextSibling;
-                if (fallback) {
-                  fallback.style.display = 'inline';
-                }
               }}
             />
-            <span className="navbar-logo-text" style={{ display: 'none' }}>
+            <span className="navbar-logo-text">
               {settings.site_name}
             </span>
           </Link>
