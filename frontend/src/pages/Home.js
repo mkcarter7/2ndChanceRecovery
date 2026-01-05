@@ -111,7 +111,7 @@ const Home = () => {
             <h1>
               {settings.hero_title}
             </h1>
-            <p className="hero-subtitle">
+            <p className="hero-subtitle" style={{ whiteSpace: 'pre-line' }}>
               {settings.hero_subtitle}
             </p>
             <div className="hero-buttons">
