@@ -33,6 +33,11 @@
   display: block;
 }
 
+.navbar-logo-text {
+  display: inline;
+  color: #FFFFFF;
+}
+
 .navbar-menu {
   display: flex;
   list-style: none;

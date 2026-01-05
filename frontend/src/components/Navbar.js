@@ -37,14 +37,22 @@ const Navbar = () => {
         <div className="navbar-content">
           <Link to="/" className="navbar-logo">
             <img 
-              src={`${process.env.PUBLIC_URL || ''}/logo.jpg`} 
+              src="/logo.jpg" 
               alt={settings.site_name} 
               className="navbar-logo-img"
               onError={(e) => {
                 console.error('Logo failed to load:', e.target.src);
                 e.target.style.display = 'none';
+                // Show text fallback if image fails
+                const fallback = e.target.nextSibling;
+                if (fallback) {
+                  fallback.style.display = 'inline';
+                }
               }}
             />
+            <span className="navbar-logo-text" style={{ display: 'none' }}>
+              {settings.site_name}
+            </span>
           </Link>
           
           <button 
