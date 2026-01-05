@@ -20,6 +20,15 @@
   color: #FFFFFF;
   text-decoration: none;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
 .navbar-menu {
@@ -99,6 +108,10 @@
     font-size: 1.25rem;
   }
   
+  .navbar-logo-img {
+    height: 32px;
+  }
+  
   .navbar-toggle {
     display: flex;
     min-width: 44px; /* Touch target size */
@@ -158,6 +171,10 @@
 @media (max-width: 480px) {
   .navbar-logo {
     font-size: 1.1rem;
+  }
+  
+  .navbar-logo-img {
+    height: 28px;
   }
   
   .navbar-menu li a {
