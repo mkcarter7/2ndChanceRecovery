@@ -37,12 +37,17 @@ const Navbar = () => {
         <div className="navbar-content">
           <Link to="/" className="navbar-logo">
             <img 
-              src="/logo.jpg" 
+              src={`${window.location.origin}/logo.jpg`} 
               alt="" 
               className="navbar-logo-img"
               onError={(e) => {
                 console.error('Logo failed to load:', e.target.src);
-                e.target.style.display = 'none';
+                // Try fallback path
+                if (!e.target.src.includes('/static/')) {
+                  e.target.src = '/static/logo.jpg';
+                } else {
+                  e.target.style.display = 'none';
+                }
               }}
             />
             <span className="navbar-logo-text">
