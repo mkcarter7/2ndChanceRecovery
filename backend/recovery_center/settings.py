@@ -183,11 +183,15 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20
 }
 
-# CSRF Trusted Origins
+# CSRF Trusted Origins (Django admin and forms need the request origin listed here)
 CSRF_TRUSTED_ORIGINS = [
     'https://cleanandsoberhome.com',
     'https://www.cleanandsoberhome.com',
 ]
+if config('RAILWAY_PUBLIC_DOMAIN', default=None):
+    railway_domain = config('RAILWAY_PUBLIC_DOMAIN').strip()
+    if railway_domain:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{railway_domain}')
 if config('CUSTOM_DOMAIN', default=None):
     custom_domain = config('CUSTOM_DOMAIN').strip()
     if not custom_domain.startswith(('http://', 'https://')):
