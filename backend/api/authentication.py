@@ -6,8 +6,10 @@ import os
 import json
 import logging
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
+User = get_user_model()
 
 
 class FirebaseAuthentication(authentication.BaseAuthentication):
@@ -79,15 +81,21 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             
             decoded_token = auth.verify_id_token(token, app=app)
             uid = decoded_token['uid']
-            
-            # Return a user object with necessary attributes for Django REST Framework
-            # Create a simple object that mimics Django's User model
+            email = decoded_token.get('email')
+
+            # Only Django superusers (matched by email) can access admin
+            is_superuser = False
+            if email:
+                django_user = User.objects.filter(email__iexact=email).first()
+                is_superuser = django_user is not None and django_user.is_superuser
+
             user = type('User', (), {
                 'uid': uid,
-                'email': decoded_token.get('email'),
+                'email': email,
                 'is_authenticated': True,
                 'is_active': True,
                 'is_anonymous': False,
+                'is_superuser': is_superuser,
             })()
             return (user, None)
             

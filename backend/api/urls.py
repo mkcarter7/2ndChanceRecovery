@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     ContactFormViewSet, ReviewViewSet, ProgramViewSet,
     HousingViewSet, SiteSettingsViewSet, AmazonWishListViewSet, DonorViewSet,
-    HousingApplicationViewSet
+    HousingApplicationViewSet, MeView
 )
 
 router = DefaultRouter()
@@ -18,4 +18,5 @@ router.register(r'housing-applications', HousingApplicationViewSet, basename='ho
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('me/', MeView.as_view(), name='me'),
 ]

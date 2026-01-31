@@ -1,9 +1,16 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, BasePermission
+from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from .models import ContactForm, Review, Program, Housing, SiteSettings, AmazonWishList, Donor, HousingApplication
+
+
+class IsSuperuser(BasePermission):
+    """Only allow Django superusers (matched by Firebase email)."""
+    def has_permission(self, request, view):
+        return getattr(request.user, 'is_superuser', False)
 from .serializers import (
     ContactFormSerializer, ReviewSerializer, PublicReviewSerializer,
     ProgramSerializer, HousingSerializer, SiteSettingsSerializer,
@@ -24,7 +31,7 @@ class ContactFormViewSet(viewsets.ModelViewSet):
         # Check if this is a submit or create endpoint
         if action_name in ['create', 'submit'] or 'submit' in path:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsSuperuser()]
     
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def submit(self, request):
@@ -51,8 +58,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if action_name == 'list' and 'public' in self.request.query_params:
             return [AllowAny()]
         if action_name == 'list' and 'public' not in self.request.query_params:
-            return [IsAuthenticated()]
-        return [IsAuthenticated()]
+            return [IsSuperuser()]
+        return [IsSuperuser()]
     
     def get_serializer_class(self):
         if self.action in ['public', 'featured'] or (self.action == 'list' and 'public' in self.request.query_params):
@@ -89,10 +96,10 @@ class ProgramViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsSuperuser()]
     
     def get_queryset(self):
-        if hasattr(self.request.user, 'is_authenticated') and self.request.user.is_authenticated:
+        if getattr(self.request.user, 'is_superuser', False):
             return Program.objects.all()
         return Program.objects.filter(is_active=True)
 
@@ -104,10 +111,10 @@ class HousingViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsSuperuser()]
     
     def get_queryset(self):
-        if hasattr(self.request.user, 'is_authenticated') and self.request.user.is_authenticated:
+        if getattr(self.request.user, 'is_superuser', False):
             return Housing.objects.all()
         return Housing.objects.filter(is_available=True)
 
@@ -119,7 +126,7 @@ class SiteSettingsViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['retrieve', 'public']:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsSuperuser()]
     
     def get_object(self):
         obj, created = SiteSettings.objects.get_or_create(pk=1)
@@ -151,10 +158,10 @@ class AmazonWishListViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsSuperuser()]
     
     def get_queryset(self):
-        if hasattr(self.request.user, 'is_authenticated') and self.request.user.is_authenticated:
+        if getattr(self.request.user, 'is_superuser', False):
             return AmazonWishList.objects.all()
         return AmazonWishList.objects.filter(is_active=True)
 
@@ -166,15 +173,15 @@ class DonorViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'feed']:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsSuperuser()]
     
     def get_serializer_class(self):
-        if self.action in ['feed', 'list'] and not (hasattr(self.request.user, 'is_authenticated') and self.request.user.is_authenticated):
+        if self.action in ['feed', 'list'] and not getattr(self.request.user, 'is_superuser', False):
             return PublicDonorSerializer
         return DonorSerializer
     
     def get_queryset(self):
-        if hasattr(self.request.user, 'is_authenticated') and self.request.user.is_authenticated:
+        if getattr(self.request.user, 'is_superuser', False):
             return Donor.objects.all()
         return Donor.objects.filter(is_featured=True).order_by('-created_at')
     
@@ -198,7 +205,7 @@ class HousingApplicationViewSet(viewsets.ModelViewSet):
         # Check if this is a submit or create endpoint
         if action_name in ['create', 'submit'] or 'submit' in path:
             return [AllowAny()]
-        return [IsAuthenticated()]
+        return [IsSuperuser()]
     
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def submit(self, request):
@@ -207,3 +214,14 @@ class HousingApplicationViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class MeView(APIView):
+    """Current user info (email, is_superuser) for admin access check."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({
+            'email': getattr(request.user, 'email', None),
+            'is_superuser': getattr(request.user, 'is_superuser', False),
+        })
